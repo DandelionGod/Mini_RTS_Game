@@ -1,10 +1,8 @@
 ﻿using TMPro;
 using UnityEngine;
 
-
 public class Portal : Building
 {
-
 
 	[SerializeField] private TextMeshProUGUI _goodsForSellCoutView;
 
@@ -12,7 +10,6 @@ public class Portal : Building
 	private float _deltaBuy = 1.5f;
 
 	private GameManager gm => GameManager.Instance;
-
 
 
 	protected override void Upgrade()
@@ -48,6 +45,5 @@ public class Portal : Building
 			gm.credits -= result * _deltaBuy;
 		}
 	}
-
 
 }

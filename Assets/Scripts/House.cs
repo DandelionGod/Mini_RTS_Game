@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 public class House : Building
 {
 
@@ -11,6 +10,5 @@ public class House : Building
 		gm.populationPlus += Mathf.RoundToInt(gm.populationPlus * 0.05f);
 		Debug.Log($"Population limit = {gm.populationLimit}, Population plus = {gm.populationPlus}");
 	}
-
 
 }

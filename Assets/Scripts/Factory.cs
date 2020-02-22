@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 
-
 public class Factory : Building
 {
-
 
 	protected override void Upgrade()
 	{
@@ -11,6 +9,5 @@ public class Factory : Building
 		gm.productsPlus += gm.productsPlus * 0.0175f;
 		Debug.Log($"product plus = {gm.productsPlus}");
 	}
-
 
 }

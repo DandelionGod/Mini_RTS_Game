@@ -1,7 +1,5 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
-
 
 public class Building : MonoBehaviour
 {
@@ -10,24 +8,21 @@ public class Building : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _lvlUpProductsPriceView;
 	[SerializeField] private TextMeshProUGUI _lvlUpCreditsPriceView;
 
-	private int _level = 1;
-
+	protected int _level = 1;
 	private int _prevLevelUpGs = -1;
-	
-	private int _lvlUpProductsPrice = 0;
-	private int _lvlUpCreditsPrice = 0;
-
 	private const string _LVLUP = "Lvl up to";
 
+	public int lvlUpProductsPrice { get; set; } = 0;
+	public int lvlUpCreditsPrice { get; set; } = 0;
 
 
 	void Start()
-    {
-		_lvlUpProductsPrice = CalcLvlUpPrice(1);
-		_lvlUpCreditsPrice = _lvlUpProductsPrice;
+	{
+		lvlUpProductsPrice = CalcLvlUpPrice(1);
+		lvlUpCreditsPrice = lvlUpProductsPrice;
 
-		_lvlUpProductsPriceView.text = _lvlUpProductsPrice.ToString();
-		_lvlUpCreditsPriceView.text = _lvlUpCreditsPrice.ToString();
+		_lvlUpProductsPriceView.text = lvlUpProductsPrice.ToString();
+		_lvlUpCreditsPriceView.text = lvlUpCreditsPrice.ToString();
 
 		Debug.Log("GameStart");
 
@@ -37,20 +32,14 @@ public class Building : MonoBehaviour
 	public void LevelUp()
 	{
 		GameManager gm = GameManager.Instance;
-		if (gm.countGs != _prevLevelUpGs && gm.products >= _lvlUpProductsPrice && gm.credits >= _lvlUpCreditsPrice)
+		if (gm.countGs != _prevLevelUpGs && gm.products >= lvlUpProductsPrice && gm.credits >= lvlUpCreditsPrice)
 		{
-			gm.products -= _lvlUpProductsPrice;
-			gm.credits -= _lvlUpCreditsPrice;
+			gm.products -= lvlUpProductsPrice;
+			gm.credits -= lvlUpCreditsPrice;
 
 			_level++;
 
-			_lvlUpProductsPrice = CalcLvlUpPrice(_level);
-			_lvlUpCreditsPrice = _lvlUpProductsPrice;
-
-			_lvlUpProductsPriceView.text = _lvlUpProductsPrice.ToString();
-			_lvlUpCreditsPriceView.text = _lvlUpCreditsPrice.ToString();
-
-			_levelView.text = $"{_LVLUP} {_level + 1}";
+			UpdateDataByLevel();
 
 			Debug.Log($"Level Up to {_level}");
 
@@ -59,7 +48,38 @@ public class Building : MonoBehaviour
 	}
 
 
-	protected virtual void Upgrade() 
+	public void LevelDown(int level)
+	{
+		if (level < _level)
+		{
+			_level -= level;
+		}
+		else
+		{
+			level = _level - 1;
+			_level = 1;
+		}
+
+		UpdateDataByLevel();
+
+		Downgrade(level);
+	}
+
+
+	private void UpdateDataByLevel()
+	{
+		lvlUpProductsPrice = CalcLvlUpPrice(_level);
+		lvlUpCreditsPrice = lvlUpProductsPrice;
+
+		_lvlUpProductsPriceView.text = lvlUpProductsPrice.ToString();
+		_lvlUpCreditsPriceView.text = lvlUpCreditsPrice.ToString();
+
+		_levelView.text = $"{_LVLUP} {_level + 1}";
+	}
+
+
+	protected virtual void Upgrade() { }
+	protected virtual void Downgrade(int level)
 	{ }
 
 

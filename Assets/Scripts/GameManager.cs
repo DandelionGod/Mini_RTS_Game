@@ -1,7 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
 
-
 public class GameManager : MonoBehaviour
 {
 
@@ -14,14 +13,14 @@ public class GameManager : MonoBehaviour
 	private float _gs = 0;
 	private const float _GS = 1;
 
-	public int countGs { private set; get; } = -1;
-	public int population { set; get; } = 200;
-	public int products { set; get; } = 300;
-	public float credits { set; get; } = 500;
-	public int populationLimit { set; get; } = 1000;
-	public int populationPlus { set; get; } = 100;
-	public float productsPlus { set; get; } = 100;
-	public float creditPlus { set; get; } = 0.1f;
+	public int countGs { get; private set; } = -1;
+	public int population { get; set; } = 200;
+	public int products { get; set; } = 300;
+	public float credits { get; set; } = 500;
+	public int populationLimit { get; set; } = 1000;
+	public int populationPlus { get; set; } = 100;
+	public float productsPlus { get; set; } = 100;
+	public float creditPlus { get; set; } = 0.1f;
 
 
 	private void Awake()
