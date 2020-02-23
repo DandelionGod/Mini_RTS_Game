@@ -12,7 +12,6 @@ public class Base : MonoBehaviour
 	[SerializeField] private Barak _barak;
 	[SerializeField] private Walls _walls;
 	[SerializeField] private Portal _portal;
-	[SerializeField] private TextMeshProUGUI _expantionBaseView;
 
 	private const int _expansionPopulationPrice = 500;
 	private const int _expansionProductsPrice = 1000;
@@ -42,7 +41,6 @@ public class Base : MonoBehaviour
 
 			_walls.LevelDown(5);
 
-			_expantionBaseView.text = "base expantion";
 			Debug.Log($"Base expansion, Houses and Factory added. Popelation limit = {gm.populationLimit}, units limit = {_barak.unitsLimit}");
 		}
 	}

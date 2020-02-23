@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 3882009234014484263}
   - component: {fileID: 3882009234014484262}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Level Up Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -756,11 +756,11 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 200, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &3882009234712556230
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -865,7 +865,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3882009235208432220}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: Products Price
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -902,7 +902,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3882009235274759655}
   m_Layer: 5
-  m_Name: GameObject (1)
+  m_Name: Credits Price
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1096,7 +1096,7 @@ GameObject:
   - component: {fileID: 3882009235461590669}
   - component: {fileID: 3882009235461590668}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Next Level Lable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
