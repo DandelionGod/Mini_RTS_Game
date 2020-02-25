@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class Map : MonoBehaviour
 {
-	[SerializeField] private List<Map> _mapsCells = new List<Map>();
-	
-	[SerializeField] private Map _originalCell;
-	[SerializeField] private GameObject _mapCellsParent;
+	[SerializeField] private Transform _cell;
+	//[SerializeField] private MeshRenderer _mrCell;
 
 
 	void Start()
 	{
 		MapGenerator(15, 15);
+		//_mrCell = GetComponent<MeshRenderer>();
+
+		Debug.Log($"Map created");
 	}
 
 
@@ -22,22 +23,24 @@ public class Map : MonoBehaviour
 	}
 
 
-	public void MapGenerator(int n, int m)
+	public void MapGenerator(int m, int n)
 	{
-		var cell = new Vector3[n, m];
-		
-		float s = 1;
-
-		for (int j = 0; j < m; j++)
+		for (int z = 0; z < n; z++)
 		{
-			for (int i = 0; i < n; i++)
+			for (int x = 0; x < m; x++)
 			{
-				cell[i, j].x = i * s;
-				cell[i, j].y = j * s;
-
-				_mapsCells.Add(Instantiate(_originalCell, _mapCellsParent.transform));
-				Debug.Log($"cell[{cell[i, j].x}, {cell[i, j].y}]");
+				Instantiate(_cell, new Vector3(x, 0, z), Quaternion.identity);
 			}
 		}
 	}
+
+
+	//public void BuyCell()
+	//{
+	//	if (Input.GetKeyUp(KeyCode.Space))
+	//	{
+	//		_mrCell.material.color = Color.blue;
+	//		Debug.Log("Cell is blue");
+	//	}
+	//}
 }
