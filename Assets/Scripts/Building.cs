@@ -1,38 +1,47 @@
-﻿using TMPro;
+﻿
 using UnityEngine;
 
-public class Building : MonoBehaviour
+
+
+public class Building<T> : MonoBehaviour where T : BuildingView
 {
 
-	[SerializeField] private TextMeshProUGUI _levelView;
-	[SerializeField] private TextMeshProUGUI _nextLevelView;
-	[SerializeField] private TextMeshProUGUI _lvlUpProductsPriceView;
-	[SerializeField] private TextMeshProUGUI _lvlUpCreditsPriceView;
+	[SerializeField] protected T _view;
 
 	protected int _level = 1;
 	private int _prevLevelUpGs = -1;
-	private const string _LVLUP = "Lvl up to";
 
 	private int _lvlUpProductsPrice = 0;
 	private int _lvlUpCreditsPrice = 0;
 
 
-	void Start()
+	protected virtual void Start()
 	{
-		_levelView.text = $"Level {_level}";
-
 		_lvlUpProductsPrice = CalcLvlUpPrice(1);
 		_lvlUpCreditsPrice = _lvlUpProductsPrice;
 
-		_lvlUpProductsPriceView.text = _lvlUpProductsPrice.ToString();
-		_lvlUpCreditsPriceView.text = _lvlUpCreditsPrice.ToString();
+		_view.leveUpProductPrice = _lvlUpProductsPrice;
+		_view.leveUpCreditPrice = _lvlUpCreditsPrice;
+
+		_view.level = _level;
+		_view.levelUpButtonPressed += LevelUp;
+
 
 		Debug.Log("GameStart");
 
 	}
 
 
-	public void LevelUp()
+	public static Building<U> Spawn<U>(Building<U> original, Transform parent, Transform viewParent) 
+		where U : BuildingView
+	{
+		var newBuilding = Instantiate(original, parent);
+		newBuilding._view = Instantiate(original._view, viewParent);
+		return newBuilding;
+	}
+
+
+	private void LevelUp()
 	{
 		GameManager gm = GameManager.Instance;
 		if (gm.countGs != _prevLevelUpGs && gm.products >= _lvlUpProductsPrice && gm.credits >= _lvlUpCreditsPrice)
@@ -76,12 +85,10 @@ public class Building : MonoBehaviour
 		_lvlUpProductsPrice = CalcLvlUpPrice(_level);
 		_lvlUpCreditsPrice = _lvlUpProductsPrice;
 
-		_lvlUpProductsPriceView.text = _lvlUpProductsPrice.ToString();
-		_lvlUpCreditsPriceView.text = _lvlUpCreditsPrice.ToString();
+		_view.leveUpProductPrice = _lvlUpProductsPrice;
+		_view.leveUpCreditPrice = _lvlUpCreditsPrice;
 
-		_levelView.text = $"Level {_level}";
-
-		_nextLevelView.text = $"{_LVLUP} {_level + 1}";
+		_view.level = _level;
 	}
 
 

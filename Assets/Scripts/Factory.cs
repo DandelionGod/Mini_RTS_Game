@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Factory : Building
+public class Factory : Building<FactoryView>
 {
 
 	protected override void Upgrade()

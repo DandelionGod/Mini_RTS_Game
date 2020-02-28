@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
-public class House : Building
+public class House : Building<HousesView>
 {
+
+	
 
 	protected override void Upgrade()
 	{

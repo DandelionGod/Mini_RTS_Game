@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-	[SerializeField] private List<Building> _buildings = new List<Building>();
-
-	[SerializeField] private Building _originalHouses;
-	[SerializeField] private Building _originalFactory;
+	[SerializeField] private Transform _baseView;
+	[SerializeField] private House _originalHouse;
+	[SerializeField] private Factory _originalFactory;
 	[SerializeField] private GameObject _buildingsParent;
 	[SerializeField] private Barak _barak;
 	[SerializeField] private Walls _walls;
 	[SerializeField] private Portal _portal;
+	[SerializeField] private Map _map;
 
 	private const int _expansionPopulationPrice = 500;
 	private const int _expansionProductsPrice = 1000;
@@ -24,25 +23,36 @@ public class Base : MonoBehaviour
 	{
 		Debug.Log("GameStart");
 	}
-	
+
 
 	private void Update()
 	{
-		if (Input.GetKeyUp(KeyCode.Space) && gm.products >= _expansionProductsPrice && gm.credits >= _expansionCreditsPrice && gm.population >= _expansionPopulationPrice)
+		if (Input.GetKeyUp(KeyCode.Space) && 
+			gm.products >= _expansionProductsPrice && 
+			gm.credits >= _expansionCreditsPrice && 
+			gm.population >= _expansionPopulationPrice)
 		{
-			gm.population -= _expansionPopulationPrice;
-			gm.products -= _expansionProductsPrice;
-			gm.credits -= _expansionCreditsPrice;
+			if (_map.TryBuyCell())
+			{
+				gm.population -= _expansionPopulationPrice;
+				gm.products -= _expansionProductsPrice;
+				gm.credits -= _expansionCreditsPrice;
 
-			_buildings.Add(Instantiate(_originalHouses, _buildingsParent.transform));
-			_buildings.Add(Instantiate(_originalFactory, _buildingsParent.transform));
-			gm.populationLimit += 1000;
-			_barak.unitsLimit += 200;
+				ExpantedBase();
 
-			_walls.LevelDown(5);
+				_walls.LevelDown(5);
 
-			Debug.Log($"Base expansion, Houses and Factory added. Popelation limit = {gm.populationLimit}, units limit = {_barak.unitsLimit}");
+				Debug.Log($"Base expansion, Houses and Factory added. Popelation limit = {gm.populationLimit}, units limit = {_barak.unitsLimit}");
+			}
 		}
 	}
 
+	private void ExpantedBase()
+	{
+		Building<BuildingView>.Spawn(_originalHouse, this.transform, _baseView);
+		Building<BuildingView>.Spawn(_originalFactory, this.transform, _baseView);
+
+		gm.populationLimit += 1000;
+		_barak.unitsLimit += 200;
+	}
 }

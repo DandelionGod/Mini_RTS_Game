@@ -1,20 +1,24 @@
 ﻿using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class Barak : Building
-{
-	[SerializeField] private List<Unit> _units = new List<Unit>();
 
-	//[SerializeField] private TextMeshProUGUI _levelView;
-	[SerializeField] private TextMeshProUGUI _spawnUnitsCoutView;
+
+public class Barak : Building<BarakView>
+{
 	[SerializeField] private GameObject _unitsParent;
 	[SerializeField] private FastUnit _originalFastUnit;
 	[SerializeField] private AttackingUnit _originalAttackingUnit;
 	[SerializeField] private ArmoredUnit _originalArmoredUnit;
+	
+
+	private List<Unit> _units = new List<Unit>();
+
+	private GameManager _gm => GameManager.Instance;
+	//private new BarakView _view => base._view as BarakView;
 
 
 	public int unitsLimit { get; set; } = 100;
+	
 	private float _unitsAttack = 0.1f;
 	private float _unitsArmor = 0.1f;
 	private int _prevSpawnFastUnitGs = -1;
@@ -22,6 +26,17 @@ public class Barak : Building
 	private int _prevSpawnArmoredUnitGs = -1;
 	private int _productsSpawnUnitPrice = 10;
 	private int _creditsSpawnUnitPrice = 10;
+
+
+
+	protected override void Start()
+	{
+		base.Start();
+
+		_view.spawnFastUnitButtonPressed += SpawnFastUnit;
+		_view.spawnAttackingUnitButtonPressed += SpawnAttackingUnit;
+		_view.spawnArmoredUnitButtonPressed += SpawnArmoredUnit;
+	}
 
 
 	protected override void Upgrade()
@@ -34,58 +49,54 @@ public class Barak : Building
 	}
 
 
-	public void SpawnFastUnit()
+	private void SpawnFastUnit()
 	{
-		GameManager gm = GameManager.Instance;
-		if (gm.countGs != _prevSpawnFastUnitGs && gm.products >= _productsSpawnUnitPrice && gm.credits >= _creditsSpawnUnitPrice && int.TryParse(_spawnUnitsCoutView.text.Substring(0, _spawnUnitsCoutView.textInfo.characterCount - 1), out int result))
+		if (_gm.countGs != _prevSpawnFastUnitGs)
 		{
-			SpawnUnit(gm, result);
-
-			for (int i = 0; i < result; i++)
-			{
-				_units.Add(Instantiate(_originalFastUnit, _unitsParent.transform));
-			}
+			SpawnUnit(_originalFastUnit);
+			_prevSpawnFastUnitGs = _gm.countGs;
 		}
-
 	}
 
 
-	public void SpawnAttackingUnit()
+	private void SpawnAttackingUnit()
 	{
-		GameManager gm = GameManager.Instance;
-		if (gm.countGs != _prevSpawnAttackingUnitGs && gm.products >= _productsSpawnUnitPrice && gm.credits >= _creditsSpawnUnitPrice && int.TryParse(_spawnUnitsCoutView.text.Substring(0, _spawnUnitsCoutView.textInfo.characterCount - 1), out int result))
+		if (_gm.countGs != _prevSpawnAttackingUnitGs)
 		{
-			SpawnUnit(gm, result);
-			
-			for (int i = 0; i < result; i++)
-			{
-				_units.Add(Instantiate(_originalAttackingUnit, _unitsParent.transform));
-			}
-		}
+			SpawnUnit(_originalAttackingUnit);
+			_prevSpawnAttackingUnitGs = _gm.countGs;
 
+		}
 	}
 
 
-	public void SpawnArmoredUnit()
+	private void SpawnArmoredUnit()
 	{
-		GameManager gm = GameManager.Instance;
-		if (gm.countGs != _prevSpawnArmoredUnitGs && gm.products >= _productsSpawnUnitPrice && gm.credits >= _creditsSpawnUnitPrice && int.TryParse(_spawnUnitsCoutView.text.Substring(0, _spawnUnitsCoutView.textInfo.characterCount - 1), out int result))
+		if (_gm.countGs != _prevSpawnArmoredUnitGs)
 		{
-			SpawnUnit(gm, result);
-			
-			for (int i = 0; i < result; i++)
-			{
-				_units.Add(Instantiate(_originalArmoredUnit, _unitsParent.transform));
-			}
+			SpawnUnit(_originalArmoredUnit);
+			_prevSpawnArmoredUnitGs = _gm.countGs;
 		}
-
 	}
 
 
-	public void SpawnUnit(GameManager gm, int result)
+	private void SpawnUnit(Unit unitOriginal)
 	{
-		gm.population -= result;
-		gm.products -= _productsSpawnUnitPrice * result;
-		gm.credits -= _creditsSpawnUnitPrice * result;
+		
+		if (!int.TryParse(_view.spawnUnitsCount, out int uninCount) ||
+			_gm.products < _productsSpawnUnitPrice * uninCount ||
+			_gm.credits < _creditsSpawnUnitPrice * uninCount)
+		{
+			return;
+		}
+
+		_gm.population -= uninCount;
+		_gm.products -= _productsSpawnUnitPrice * uninCount;
+		_gm.credits -= _creditsSpawnUnitPrice * uninCount;
+
+		for (int i = 0; i < uninCount; i++)
+		{
+			_units.Add(Instantiate(unitOriginal, _unitsParent.transform));
+		}
 	}
 }

@@ -1,62 +1,53 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+
 
 public class Cell : MonoBehaviour
 {
+	private Map _map;
+
 	private MeshRenderer _mr;
-	static MeshRenderer prev;
+	private bool _isSelected = false;
+	public Vector2Int coords { get; private set; }
+
+	public bool isBought { get; private set; } = false;
 
 
-	private void OnMouseEnter()
+
+	internal void Init(Map map, int i, int j)
 	{
-		Debug.Log(name);
-
-	}
-
-
-	private void OnMouseExit()
-	{
-		Debug.Log(name);
-
+		_mr = GetComponent<MeshRenderer>();
+		_map = map;
+		coords = new Vector2Int(i, j);
 	}
 
 
 	private void OnMouseUp()
 	{
-		if (prev != null)
-		{
-			prev.material.color = Color.white;
-		}
-
-		Debug.Log(name);
-
-		_mr.material.color = Color.green;
-		prev = _mr;
+		_map.OnCellMouseUp(this);
 	}
 
 
-	public void BuyCell()
+	internal void Unselect()
 	{
-		//if (Input.GetKeyUp(KeyCode.Space) && _mr.material.color == Color.green)
-		//{
-			_mr.material.color = Color.blue;
-			Debug.Log("Cell is blue");
-		//}
+		_isSelected = false;
+
+		if (!isBought)
+			_mr.material.color = Color.white;
 	}
 
-
-	void Start()
+	internal void Select()
 	{
-		_mr = GetComponent<MeshRenderer>();
+		_isSelected = true;
+
+		if (!isBought)
+			_mr.material.color = Color.green;
 	}
 
-
-	void Update()
+	internal void Buy()
 	{
-		if (Input.GetKeyUp(KeyCode.Space) && _mr.material.color == Color.green)
-		{
-			BuyCell();
-		}
+		isBought = true;
+
+		_mr.material.color = Color.blue;
 	}
 }

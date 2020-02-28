@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Walls : Building
+public class Walls : Building<WallsView>
 {
 
 	private float _wallDefence = 0.05f;

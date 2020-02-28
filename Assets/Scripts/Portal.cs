@@ -1,48 +1,57 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Portal : Building
+public class Portal : Building<PortalView>
 {
-
-	[SerializeField] private TextMeshProUGUI _goodsForSellCoutView;
 
 	private float _deltaSell = 0.5f;
 	private float _deltaBuy = 1.5f;
 
-	private GameManager gm => GameManager.Instance;
+	private GameManager _gm => GameManager.Instance;
+
+
+
+	protected override void Start()
+	{
+		base.Start();
+
+		_view.buyButtonPressed += BuyGoods;
+		_view.sellButtonPressed += SellGoods;
+	}
 
 
 	protected override void Upgrade()
 	{
 		_deltaSell += 0.5f;
 		_deltaBuy -= 0.5f;
-		gm.productsPlus += gm.productsPlus * 0.0025f;
-		gm.creditPlus += 0.0025f;
-		Debug.Log($"delta sell = {_deltaSell}, delta buy = {_deltaBuy}, product plus = {gm.productsPlus}, credit plus = {gm.creditPlus}");
+		_gm.productsPlus += _gm.productsPlus * 0.0025f;
+		_gm.creditPlus += 0.0025f;
+		Debug.Log($"delta sell = {_deltaSell}, delta buy = {_deltaBuy}, product plus = {_gm.productsPlus}, credit plus = {_gm.creditPlus}");
 	}
 
 
-	public void SellGoods()
+	private void SellGoods()
 	{
 		Debug.Log("Sell");
-		if (int.TryParse(_goodsForSellCoutView.text.Substring(0, _goodsForSellCoutView.textInfo.characterCount - 1), out int result))
+		if (int.TryParse(_view.goodsForSellCount, out int productsCount) &&
+			_gm.products >= productsCount)
 		{
-			Debug.Log($"Sell {result} products and recived {result * _deltaSell} credist");
-			gm.products -= result;
-			gm.credits += result * _deltaSell;
+			Debug.Log($"Sell {productsCount} products and recived {productsCount * _deltaSell} credist");
+			_gm.products -= productsCount;
+			_gm.credits += productsCount * _deltaSell;
 		}
 
 	}
 
 
-	public void BuyGoods()
+	private void BuyGoods()
 	{
 		Debug.Log("Buy");
-		if (int.TryParse(_goodsForSellCoutView.text.Substring(0, _goodsForSellCoutView.textInfo.characterCount - 1), out int result))
+		if (int.TryParse(_view.goodsForSellCount, out int productsCount) &&
+			_gm.credits >= productsCount * _deltaBuy)
 		{
-			Debug.Log($"Buy {result} products and paid {result * _deltaBuy} credits");
-			gm.products += result;
-			gm.credits -= result * _deltaBuy;
+			Debug.Log($"Buy {productsCount} products and paid {productsCount * _deltaBuy} credits");
+			_gm.products += productsCount;
+			_gm.credits -= productsCount * _deltaBuy;
 		}
 	}
 
