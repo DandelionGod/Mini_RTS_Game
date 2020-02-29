@@ -9,12 +9,12 @@ public class Building<T> : MonoBehaviour where T : BuildingView
 	[SerializeField] protected T _view;
 
 	protected int _level = 1;
+	private float _levelUpTimer;
 
 	private int _lvlUpProductsPrice = 0;
 	private int _lvlUpCreditsPrice = 0;
 
 	private bool _isLevelUpProgress;
-	private float _levelUpTimer;
 
 
 

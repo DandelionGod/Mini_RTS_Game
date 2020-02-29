@@ -8,7 +8,7 @@ public class Base : MonoBehaviour
 	[SerializeField] private Factory _originalFactory;
 	[SerializeField] private House _originalHouse;
 
-	[SerializeField] private Barak _barak;
+	[SerializeField] private Barrack _barak;
 	[SerializeField] private Walls _walls;
 
 	[SerializeField] private Map _map;

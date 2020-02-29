@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 
-public class Barak : Building<BarakView>
+public class Barrack : Building<BarrackView>
 {
 	[SerializeField] private GameObject _unitsParent;
 	[SerializeField] private FastUnit _originalFastUnit;
@@ -68,6 +68,8 @@ public class Barak : Building<BarakView>
 			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
 
 			_currentTrainingUnit = _originalFastUnit;
+
+			_view._trainUnitButtonInterractive = false;
 		}
 	}
 
@@ -81,6 +83,7 @@ public class Barak : Building<BarakView>
 			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
 
 			_currentTrainingUnit = _originalAttackingUnit;
+			_view._trainUnitButtonInterractive = false;
 		}
 	}
 
@@ -94,6 +97,7 @@ public class Barak : Building<BarakView>
 			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
 
 			_currentTrainingUnit = _originalArmoredUnit;
+			_view._trainUnitButtonInterractive = false;
 		}
 	}
 
@@ -127,8 +131,10 @@ public class Barak : Building<BarakView>
 		if (_currentTrainingUnit != null)
 		{
 			_trainingTime += Time.deltaTime;
+			_view._trainUnitProgressValue = _trainingTime / GameManager._GS;
 			if (_trainingTime >= GameManager._GS)
 			{
+				_view._trainUnitButtonInterractive = true;
 				SpawnSquad(_currentTrainingUnit, _currentTrainingUnitCount);
 				_currentTrainingUnit = null;
 				_currentTrainingUnitCount = 0;
