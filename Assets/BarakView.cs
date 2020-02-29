@@ -7,7 +7,7 @@ public class BarakView : BuildingView
     [SerializeField] private TextMeshProUGUI _spawnUnitsCout;
 
     public string spawnUnitsCount => 
-        _spawnUnitsCout.text.Substring(0, _spawnUnitsCout.textInfo.characterCount - 1);
+        _spawnUnitsCout.text.Substring(0, Math.Max(0, _spawnUnitsCout.textInfo.characterCount - 1));
 
     public event Action spawnFastUnitButtonPressed;
     public event Action spawnAttackingUnitButtonPressed;

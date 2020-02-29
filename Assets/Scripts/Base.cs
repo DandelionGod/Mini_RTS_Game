@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-	[SerializeField] private Transform _baseView;
-	[SerializeField] private House _originalHouse;
+	[SerializeField] private BaseView _view;
+
 	[SerializeField] private Factory _originalFactory;
-	[SerializeField] private GameObject _buildingsParent;
+	[SerializeField] private House _originalHouse;
+
 	[SerializeField] private Barak _barak;
 	[SerializeField] private Walls _walls;
-	[SerializeField] private Portal _portal;
+
 	[SerializeField] private Map _map;
+
 
 	private const int _expansionPopulationPrice = 500;
 	private const int _expansionProductsPrice = 1000;
@@ -21,38 +23,62 @@ public class Base : MonoBehaviour
 
 	private void Start()
 	{
-		Debug.Log("GameStart");
+		_map.cellSelected += OnCellSelect;
+
+		_barak.unitSpawned += OnUnitSpawned;
+		_barak.Init(_map.startCell);
+
+		_view.buyCellButtonPressed += TryBuyCell;
+		_view.ShowBuyCellButton(false, Vector3.zero);
 	}
 
 
-	private void Update()
+	private void OnUnitSpawned(Unit unit)
 	{
-		if (Input.GetKeyUp(KeyCode.Space) && 
-			gm.products >= _expansionProductsPrice && 
-			gm.credits >= _expansionCreditsPrice && 
+		_map.startCell.unit = unit;
+	}
+
+
+	private void OnCellSelect(Cell cell)
+	{
+		var isCellCanBeBought = _map.IsCellCanBeBought(cell);
+		var cellPosition = isCellCanBeBought ? cell.transform.position : Vector3.zero;
+		_view.ShowBuyCellButton(isCellCanBeBought, cellPosition);
+	}
+
+
+	private void TryBuyCell()
+	{
+		if (gm.products >= _expansionProductsPrice &&
+			gm.credits >= _expansionCreditsPrice &&
 			gm.population >= _expansionPopulationPrice)
 		{
-			if (_map.TryBuyCell())
-			{
-				gm.population -= _expansionPopulationPrice;
-				gm.products -= _expansionProductsPrice;
-				gm.credits -= _expansionCreditsPrice;
+			_map.BuyCell(_map.selectedCell);
+			
+			gm.population -= _expansionPopulationPrice;
+			gm.products -= _expansionProductsPrice;
+			gm.credits -= _expansionCreditsPrice;
 
-				ExpantedBase();
+			ExpandBase();
 
-				_walls.LevelDown(5);
+			_walls.LevelDown(5);
 
-				Debug.Log($"Base expansion, Houses and Factory added. Popelation limit = {gm.populationLimit}, units limit = {_barak.unitsLimit}");
-			}
+			_view.ShowBuyCellButton(false, Vector3.zero);
+
+			Debug.Log($"Base expansion, Houses and Factory added. Popelation limit = {gm.populationLimit}, units limit = {_barak.unitsLimit}");
 		}
 	}
 
-	private void ExpantedBase()
+
+	private void ExpandBase()
 	{
-		Building<BuildingView>.Spawn(_originalHouse, this.transform, _baseView);
-		Building<BuildingView>.Spawn(_originalFactory, this.transform, _baseView);
+		Building<BuildingView>.Spawn(_originalHouse, this.transform, _view.transform);
+		Building<BuildingView>.Spawn(_originalFactory, this.transform, _view.transform);
 
 		gm.populationLimit += 1000;
 		_barak.unitsLimit += 200;
 	}
+
+
+	
 }

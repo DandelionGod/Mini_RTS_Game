@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -9,23 +10,26 @@ public class Barak : Building<BarakView>
 	[SerializeField] private FastUnit _originalFastUnit;
 	[SerializeField] private AttackingUnit _originalAttackingUnit;
 	[SerializeField] private ArmoredUnit _originalArmoredUnit;
-	
+
+
+	private Unit _currentTrainingUnit;
+	private int _currentTrainingUnitCount;
+	private float _trainingTime;
 
 	private List<Unit> _units = new List<Unit>();
 
 	private GameManager _gm => GameManager.Instance;
-	//private new BarakView _view => base._view as BarakView;
 
 
 	public int unitsLimit { get; set; } = 100;
-	
+
 	private float _unitsAttack = 0.1f;
 	private float _unitsArmor = 0.1f;
-	private int _prevSpawnFastUnitGs = -1;
-	private int _prevSpawnAttackingUnitGs = -1;
-	private int _prevSpawnArmoredUnitGs = -1;
 	private int _productsSpawnUnitPrice = 10;
 	private int _creditsSpawnUnitPrice = 10;
+	private Cell _spawnCell;
+
+	public event Action<Unit> unitSpawned;
 
 
 
@@ -36,6 +40,12 @@ public class Barak : Building<BarakView>
 		_view.spawnFastUnitButtonPressed += SpawnFastUnit;
 		_view.spawnAttackingUnitButtonPressed += SpawnAttackingUnit;
 		_view.spawnArmoredUnitButtonPressed += SpawnArmoredUnit;
+	}
+
+
+	internal void Init(Cell spawnCell)
+	{
+		_spawnCell = spawnCell;
 	}
 
 
@@ -51,52 +61,93 @@ public class Barak : Building<BarakView>
 
 	private void SpawnFastUnit()
 	{
-		if (_gm.countGs != _prevSpawnFastUnitGs)
+		if (IsCanTrainUnit())
 		{
-			SpawnUnit(_originalFastUnit);
-			_prevSpawnFastUnitGs = _gm.countGs;
+			_gm.population -= _currentTrainingUnitCount;
+			_gm.products -= _productsSpawnUnitPrice * _currentTrainingUnitCount;
+			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
+
+			_currentTrainingUnit = _originalFastUnit;
 		}
 	}
 
 
 	private void SpawnAttackingUnit()
 	{
-		if (_gm.countGs != _prevSpawnAttackingUnitGs)
+		if (IsCanTrainUnit())
 		{
-			SpawnUnit(_originalAttackingUnit);
-			_prevSpawnAttackingUnitGs = _gm.countGs;
+			_gm.population -= _currentTrainingUnitCount;
+			_gm.products -= _productsSpawnUnitPrice * _currentTrainingUnitCount;
+			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
 
+			_currentTrainingUnit = _originalAttackingUnit;
 		}
 	}
 
 
 	private void SpawnArmoredUnit()
 	{
-		if (_gm.countGs != _prevSpawnArmoredUnitGs)
+		if (IsCanTrainUnit())
 		{
-			SpawnUnit(_originalArmoredUnit);
-			_prevSpawnArmoredUnitGs = _gm.countGs;
+			_gm.population -= _currentTrainingUnitCount;
+			_gm.products -= _productsSpawnUnitPrice * _currentTrainingUnitCount;
+			_gm.credits -= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
+
+			_currentTrainingUnit = _originalArmoredUnit;
 		}
 	}
 
 
-	private void SpawnUnit(Unit unitOriginal)
+	private bool IsCanTrainUnit()
 	{
-		
-		if (!int.TryParse(_view.spawnUnitsCount, out int uninCount) ||
-			_gm.products < _productsSpawnUnitPrice * uninCount ||
-			_gm.credits < _creditsSpawnUnitPrice * uninCount)
-		{
-			return;
-		}
-
-		_gm.population -= uninCount;
-		_gm.products -= _productsSpawnUnitPrice * uninCount;
-		_gm.credits -= _creditsSpawnUnitPrice * uninCount;
-
-		for (int i = 0; i < uninCount; i++)
-		{
-			_units.Add(Instantiate(unitOriginal, _unitsParent.transform));
-		}
+		return
+			_currentTrainingUnit == null &&
+			_spawnCell.unit == null &&
+			_currentTrainingUnitCount > 0 &&
+			_gm.products >= _productsSpawnUnitPrice * _currentTrainingUnitCount &&
+			_gm.credits >= _creditsSpawnUnitPrice * _currentTrainingUnitCount;
 	}
+
+
+	private void SpawnSquad(Unit unitOriginal, int unitCount)
+	{
+		var squad = Instantiate(unitOriginal, _spawnCell.transform.position, Quaternion.identity, _unitsParent.transform);
+		squad.count = unitCount;
+		squad.Deselect();
+		_units.Add(squad);
+
+		unitSpawned?.Invoke(squad);
+	}
+
+
+	protected override void Update()
+	{
+		base.Update();
+
+		if (_currentTrainingUnit != null)
+		{
+			_trainingTime += Time.deltaTime;
+			if (_trainingTime >= GameManager._GS)
+			{
+				SpawnSquad(_currentTrainingUnit, _currentTrainingUnitCount);
+				_currentTrainingUnit = null;
+				_currentTrainingUnitCount = 0;
+				_trainingTime = 0.0f;
+			}
+		}
+		else
+		{
+			if (int.TryParse(_view.spawnUnitsCount, out int uninCount))
+			{
+				_currentTrainingUnitCount = uninCount;
+			}
+			else
+			{
+				_currentTrainingUnitCount = 0;
+			}
+		}
+
+	}
+
+
 }

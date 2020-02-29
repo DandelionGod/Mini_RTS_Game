@@ -9,10 +9,13 @@ public class Building<T> : MonoBehaviour where T : BuildingView
 	[SerializeField] protected T _view;
 
 	protected int _level = 1;
-	private int _prevLevelUpGs = -1;
 
 	private int _lvlUpProductsPrice = 0;
 	private int _lvlUpCreditsPrice = 0;
+
+	private bool _isLevelUpProgress;
+	private float _levelUpTimer;
+
 
 
 	protected virtual void Start()
@@ -24,11 +27,7 @@ public class Building<T> : MonoBehaviour where T : BuildingView
 		_view.leveUpCreditPrice = _lvlUpCreditsPrice;
 
 		_view.level = _level;
-		_view.levelUpButtonPressed += LevelUp;
-
-
-		Debug.Log("GameStart");
-
+		_view.levelUpButtonPressed += StartLevelUp;
 	}
 
 
@@ -41,22 +40,27 @@ public class Building<T> : MonoBehaviour where T : BuildingView
 	}
 
 
-	private void LevelUp()
+	private void StartLevelUp()
 	{
 		GameManager gm = GameManager.Instance;
-		if (gm.countGs != _prevLevelUpGs && gm.products >= _lvlUpProductsPrice && gm.credits >= _lvlUpCreditsPrice)
+		if (!_isLevelUpProgress &&
+			gm.products >= _lvlUpProductsPrice && 
+			gm.credits >= _lvlUpCreditsPrice)
 		{
 			gm.products -= _lvlUpProductsPrice;
 			gm.credits -= _lvlUpCreditsPrice;
 
-			_level++;
-
-			UpdateDataByLevel();
-
-			Debug.Log($"Level Up to {_level}");
-
-			Upgrade();
+			_isLevelUpProgress = true;
+			_view._lvlUpButtonInterractive = false;
 		}
+	}
+
+
+	private void LevelUp()
+	{
+		_level++;
+		UpdateDataByLevel();
+		Upgrade();
 	}
 
 
@@ -101,4 +105,20 @@ public class Building<T> : MonoBehaviour where T : BuildingView
 		return Mathf.RoundToInt(100 * lvl / 0.985f);
 	}
 
+	protected virtual void Update()
+	{
+		if (_isLevelUpProgress)
+		{
+			_levelUpTimer += Time.deltaTime;
+			_view._lvlUpProgressValue = _levelUpTimer / GameManager._GS;
+			if (_levelUpTimer >= GameManager._GS)
+			{
+				LevelUp();
+				_isLevelUpProgress = false;
+				_view._lvlUpButtonInterractive = true;
+				_levelUpTimer = 0.0f;
+			}
+		}
+
+	}
 }

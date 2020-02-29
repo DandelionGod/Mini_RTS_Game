@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _creditsView;
 
 	private float _gs = 0;
-	private const float _GS = 1;
+	public const float _GS = 4;
 
 	public int countGs { get; private set; } = -1;
 	public int population { get; set; } = 200;

@@ -165,6 +165,8 @@ MonoBehaviour:
   _level: {fileID: 7316372164382045694}
   _lvlUpProductsPrice: {fileID: 1208223317180113203}
   _lvlUpCreditsPrice: {fileID: 1208223318091098888}
+  _lvlUpButton: {fileID: 1208223317813081950}
+  _lvlUpButtonFill: {fileID: 6495566880046366199}
 --- !u!1 &597920179630998401
 GameObject:
   m_ObjectHideFlags: 0
@@ -822,5 +824,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1208223317813081950 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3882009234014484262, guid: 6099f1fdfa48be8438668fc44c79d066,
+    type: 3}
+  m_PrefabInstance: {fileID: 2673962115205660792}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1392445389, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6495566880046366199 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9169102109740318095, guid: 6099f1fdfa48be8438668fc44c79d066,
+    type: 3}
+  m_PrefabInstance: {fileID: 2673962115205660792}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

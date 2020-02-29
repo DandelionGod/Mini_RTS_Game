@@ -1,30 +1,34 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 
 public class Cell : MonoBehaviour
 {
-	private Map _map;
-
 	private MeshRenderer _mr;
-	private bool _isSelected = false;
-	public Vector2Int coords { get; private set; }
+	private bool _isSelected;
 
 	public bool isBought { get; private set; } = false;
+	public bool isWalkable { get; private set; } = true;
+	public Vector2Int coords { get; private set; }
+	public Unit unit { get; set; }
 
+	public readonly List<Cell> neighbours = new List<Cell>();
+	public int gCost;
+	public int hCost;
+	public Cell parent;
 
+	public int fCost => gCost + hCost;
+
+	public Cell up;
+	public Cell down;
+	public Cell left;
+	public Cell right;
 
 	internal void Init(Map map, int i, int j)
 	{
 		_mr = GetComponent<MeshRenderer>();
-		_map = map;
 		coords = new Vector2Int(i, j);
-	}
-
-
-	private void OnMouseUp()
-	{
-		_map.OnCellMouseUp(this);
 	}
 
 
@@ -44,10 +48,14 @@ public class Cell : MonoBehaviour
 			_mr.material.color = Color.green;
 	}
 
+
 	internal void Buy()
 	{
 		isBought = true;
 
 		_mr.material.color = Color.blue;
 	}
+
+
+
 }

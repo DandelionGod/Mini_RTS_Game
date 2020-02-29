@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class FastUnit : Unit
+﻿public class FastUnit : Unit
 {
     private void Awake()
     {

@@ -13,7 +13,6 @@ public class PortalView : BuildingView
 	public event Action sellButtonPressed;
 
 
-
 	public void BuyButtonPressed()
 	{
 		buyButtonPressed?.Invoke();

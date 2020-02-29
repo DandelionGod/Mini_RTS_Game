@@ -1,61 +1,62 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+
 
 public class Map : MonoBehaviour
 {
-	[SerializeField] private RectTransform _buyCellButton;
 
-	[SerializeField] private Cell _cell;
-	private Cell _selectedCell;
 	private Cell[,] cells;
 
-	private const int m = 15;
-	private const int n = 15;
+	private const string _mapLayerName = "Map";
+
+	[SerializeField] private Cell _originalCell;
+
+	[SerializeField] private Vector2Int _size;
+	[SerializeField] private Vector2Int _startCell;
+
+
+	public Cell selectedCell { get; private set; }
+	public Cell startCell => cells[_startCell.x, _startCell.y];
+	public Vector2Int size => _size;
+
+	public event Action<Cell> cellSelected;
+	public event Action<Cell> cellClicked;
+
+
 
 
 	void Start()
 	{
-		MapGenerator(m, n);
-		BuyCell(cells[0, 0]);
+		MapGenerator(_size.x, _size.y);
+		BuyCell(cells[_startCell.x, _startCell.y]);
 		Debug.Log($"Map created");
 	}
 
 
-	private void Update()
+	public void MapGenerator(int n, int m)
 	{
-		if (_selectedCell != null)
+		cells = new Cell[n, m];
+		for (int i = 0; i < n; i++)
 		{
-			_buyCellButton.gameObject.SetActive(true);
-
-			Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(_selectedCell.transform.position);
-			var canvas = (RectTransform)_buyCellButton.parent;
-			Vector2 WorldObject_ScreenPosition = new Vector2(
-			((ViewportPosition.x * canvas.sizeDelta.x) - (canvas.sizeDelta.x * 0.5f)),
-			((ViewportPosition.y * canvas.sizeDelta.y) - (canvas.sizeDelta.y * 0.5f)));
-
-			//now you can set the position of the ui element
-			_buyCellButton.anchoredPosition = WorldObject_ScreenPosition;
-		}
-		else
-		{
-			_buyCellButton.gameObject.SetActive(false);
-		}
-	}
-
-
-	public void MapGenerator(int m, int n)
-	{
-		cells = new Cell[m, n];
-		for (int j = 0; j < n; j++)
-		{
-			for (int i = 0; i < m; i++)
+			for (int j = 0; j < m; j++)
 			{
-				cells[i, j] = Instantiate(_cell, new Vector3(i, 0, j), Quaternion.identity);
+				cells[i, j] = Instantiate(_originalCell, new Vector3(i, 0, j), Quaternion.identity);
 				cells[i, j].Init(this, i, j);
+				cells[i, j].gameObject.layer = LayerMask.NameToLayer(_mapLayerName);
+				cells[i, j].gameObject.hideFlags = HideFlags.HideInHierarchy;
 			}
 		}
+
+		
 	}
 
+
+	public Cell[,] GetCells()
+	{
+		return cells;
+	}
 
 	public void BuyCell(Cell cell)
 	{
@@ -63,46 +64,55 @@ public class Map : MonoBehaviour
 	}
 
 
-	public bool TryBuyCell()
+	public bool IsCellCanBeBought(Cell cell)
 	{
-		if (_selectedCell != null && !_selectedCell.isBought && IsHasBoughtNeighbors())
+		return cell != null && !cell.isBought && IsHasBoughtNeighbors(cell);
+	}
+
+
+	private bool IsHasBoughtNeighbors(Cell cell)
+	{
+		return
+			(cell.up != null ? cell.up.isBought : false) ||
+			(cell.down != null ? cell.down.isBought : false) ||
+			(cell.left != null ? cell.left.isBought : false) ||
+			(cell.right != null ? cell.right.isBought : false);
+	}
+
+
+	public void SelectCellWithLeftButton(Cell cell)
+	{
+		selectedCell?.Unselect();
+		selectedCell = cell;
+		selectedCell.Select();
+
+		cellSelected?.Invoke(cell);
+	}
+
+
+	private void Update()
+	{
+		var leftClick = Input.GetMouseButtonUp(0);
+		var rightClick = Input.GetMouseButtonUp(1);
+		if (leftClick || rightClick)
 		{
-			BuyCell(_selectedCell);
-			return true;
+			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if (Physics.Raycast(ray, out var hitInfo, 100, ~LayerMask.NameToLayer(_mapLayerName)))
+			{
+				var cell = hitInfo.collider.gameObject.GetComponent<Cell>();
+				if (cell != null)
+				{
+					if (leftClick)
+						SelectCellWithLeftButton(cell);
+					if (rightClick)
+						SelectCellWithRightButton(cell);
+				}
+			}
 		}
-		else
-			return false;
 	}
 
-	private bool IsHasBoughtNeighbors()
+	private void SelectCellWithRightButton(Cell cell)
 	{
-		var c = _selectedCell.coords;
-
-		return IsBoughtCell(c + Vector2Int.left) ||
-			IsBoughtCell(c + Vector2Int.right) ||
-			IsBoughtCell(c + Vector2Int.up) ||
-			IsBoughtCell(c + Vector2Int.down);
+		cellClicked?.Invoke(cell);
 	}
-
-
-	private bool IsBoughtCell(Vector2Int coords)
-	{
-		var c = coords;
-		if (c.x >= 0 && c.x <= m && c.y >= 0 && c.y <= n)
-			if (cells[c.x, c.y].isBought)
-				return true;
-
-		return false;
-	}
-
-
-	public void OnCellMouseUp(Cell cell)
-	{
-		_selectedCell?.Unselect();
-		_selectedCell = cell;
-		_selectedCell.Select();
-	}
-
-
-
 }
